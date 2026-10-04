@@ -1,14 +1,17 @@
 package com.porto.testecnae.service.impl;
 
 import com.porto.testecnae.dto.AtividadeEconomicaCnaeResponse;
+import com.porto.testecnae.exception.CnaeNaoEncontradoException;
 import com.porto.testecnae.repository.AtividadeEconomicaCnaeRepository;
 import com.porto.testecnae.service.AtividadeEconomicaCnaeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AtividadeEconomicaCnaeServiceImpl implements AtividadeEconomicaCnaeService {
 
@@ -34,6 +37,6 @@ public class AtividadeEconomicaCnaeServiceImpl implements AtividadeEconomicaCnae
     public AtividadeEconomicaCnaeResponse buscarPorCodigo(String codigo) {
         return repository.findByCodigo(codigo)
                 .map(AtividadeEconomicaCnaeResponse::fromEntity)
-                .orElseGet(() -> AtividadeEconomicaCnaeResponse.fromEntity(repository.findAll().getFirst()));
+                .orElseThrow(() -> new CnaeNaoEncontradoException(codigo));
     }
 }

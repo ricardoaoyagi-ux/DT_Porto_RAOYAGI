@@ -5,15 +5,18 @@ import com.porto.testecnae.domain.AtividadeEconomicaCnae;
 import com.porto.testecnae.dto.AtividadeEconomicaCnaeResponse;
 import com.porto.testecnae.dto.CadastroSecundarioRequest;
 import com.porto.testecnae.dto.CadastroSecundarioResponse;
+import com.porto.testecnae.exception.CnaeNaoEncontradoException;
 import com.porto.testecnae.repository.AtividadeEconomicaCnaeRepository;
 import com.porto.testecnae.repository.CadastroSecundarioRepository;
 import com.porto.testecnae.service.CadastroSecundarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CadastroSecundarioServiceImpl implements CadastroSecundarioService {
 
@@ -21,8 +24,9 @@ public class CadastroSecundarioServiceImpl implements CadastroSecundarioService 
     private final AtividadeEconomicaCnaeRepository cnaeRepository;
 
     @Override
+    @Transactional
     public CadastroSecundarioResponse cadastrar(CadastroSecundarioRequest request) {
-        var cnae = buscarCnaeParaCadastro(request.codigoCnae());
+        var cnae = buscarCnaePorCodigo(request.codigoCnae());
 
         var cadastro = CadastroSecundario.builder()
                 .nomeFantasia(request.nomeFantasia())
@@ -35,7 +39,7 @@ public class CadastroSecundarioServiceImpl implements CadastroSecundarioService 
 
     @Override
     public AtividadeEconomicaCnaeResponse validarCnae(String codigoCnae) {
-        return AtividadeEconomicaCnaeResponse.fromEntity(buscarCnaeParaValidacao(codigoCnae));
+        return AtividadeEconomicaCnaeResponse.fromEntity(buscarCnaePorCodigo(codigoCnae));
     }
 
     @Override
@@ -46,13 +50,8 @@ public class CadastroSecundarioServiceImpl implements CadastroSecundarioService 
                 .toList();
     }
 
-    private AtividadeEconomicaCnae buscarCnaeParaCadastro(String codigoCnae) {
+    private AtividadeEconomicaCnae buscarCnaePorCodigo(String codigoCnae) {
         return cnaeRepository.findByCodigo(codigoCnae)
-                .orElseGet(() -> cnaeRepository.findAll().getFirst());
-    }
-
-    private AtividadeEconomicaCnae buscarCnaeParaValidacao(String codigoCnae) {
-        return cnaeRepository.findByCodigo(codigoCnae)
-                .orElseGet(() -> cnaeRepository.findAll().getFirst());
+                .orElseThrow(() -> new CnaeNaoEncontradoException(codigoCnae));
     }
 }
