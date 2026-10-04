@@ -15,7 +15,7 @@ public interface AtividadeEconomicaCnaeRepository extends JpaRepository<Atividad
     @Query("""
             select c
             from AtividadeEconomicaCnae c
-            where lower(c.descricao) like lower(concat(:termo, '%'))
+            where lower(c.descricao) like lower(concat('%',:termo, '%'))
             order by c.codigo
             """)
     List<AtividadeEconomicaCnae> buscarPorDescricao(@Param("termo") String termo);

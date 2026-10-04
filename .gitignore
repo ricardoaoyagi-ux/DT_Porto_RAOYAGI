@@ -6,3 +6,4 @@ target/
 .mvn/timing.properties
 hs_err_pid*
 replay_pid*
+startup.log
