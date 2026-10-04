@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,6 +21,7 @@ import com.porto.testecnae.domain.CadastroSecundario;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class CadastroSecundarioControllerIntegrationTest {
 
     @Autowired
@@ -33,8 +35,8 @@ class CadastroSecundarioControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        repository.deleteAll();
-        cnaeRepository.deleteAll();
+        repository.deleteAllInBatch();
+        cnaeRepository.deleteAllInBatch();
     }
 
     @Test
@@ -88,6 +90,23 @@ class CadastroSecundarioControllerIntegrationTest {
 
         assertEquals(0, repository.count());
     }
+    @Test
+    void deveRetornar400ComTodasAsMensagensQuandoVariosCamposForemInvalidos() throws Exception {
+
+        mockMvc.perform(
+                        post("/api/cadastros-secundarios")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{}")
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value(
+                        "Código CNAE é obrigatório; Documento é obrigatório; Nome fantasia é obrigatório"));
+
+        assertEquals(0, repository.count());
+    }
+
     @Test
     void deveRetornar404QuandoCadastrarComCnaeInexistente() throws Exception {
 

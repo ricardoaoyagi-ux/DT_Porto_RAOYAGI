@@ -3,9 +3,13 @@ package com.porto.testecnae.exception;
 import com.porto.testecnae.dto.ApiErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,10 +33,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleValidationException(
             MethodArgumentNotValidException ex) {
 
+        // Ordena por campo para que a mensagem seja deterministica quando houver varios erros
         String mensagem = ex.getBindingResult()
                 .getFieldErrors()
-                .getFirst()
-                .getDefaultMessage();
+                .stream()
+                .sorted(Comparator.comparing(FieldError::getField)
+                        .thenComparing(FieldError::getDefaultMessage, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("; "));
+
+        if (mensagem.isBlank()) {
+            mensagem = "Requisição inválida";
+        }
 
         var erro = new ApiErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),

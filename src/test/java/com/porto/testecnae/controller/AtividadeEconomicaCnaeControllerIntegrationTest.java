@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class AtividadeEconomicaCnaeControllerIntegrationTest {
 
     @Autowired
@@ -28,7 +30,7 @@ class AtividadeEconomicaCnaeControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        repository.deleteAll();
+        repository.deleteAllInBatch();
     }
 
     @Test
