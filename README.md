@@ -92,7 +92,7 @@ Objetivo:
 Cada problema abaixo foi reproduzido com `curl` antes da correção e testado de novo depois dela. O documento de
 evidências traz as capturas de tela, com cenários válidos e inválidos para todos os endpoints, e a execução dos testes:
 
-📄 **[Evidências de teste (PDF)](DESAFIO%20TECNICO%20PORTO%20SEGURO%20-%20RICARDO_AOYAGI.pdf)**
+📄 **[Memória técnica e evidências (PDF)](DESAFIO%20TECNICO%20PORTO%20SEGURO%20-%20RICARDO_AOYAGI.pdf)**
 
 ### 1. Banco de dados
 
